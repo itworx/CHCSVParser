@@ -16,6 +16,7 @@
 		8DD76F9A0486AA7600D96B5E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8DD76F9C0486AA7600D96B5E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08FB779EFE84155DC02AAC07 /* Foundation.framework */; };
 		8DD76F9F0486AA7600D96B5E /* CHCSVParser.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859EA3029092ED04C91782 /* CHCSVParser.1 */; };
+		D3BE27001886D5F500E9AFD2 /* Roster.csv in Resources */ = {isa = PBXBuildFile; fileRef = D3BE26FF1886D5F500E9AFD2 /* Roster.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -47,6 +48,7 @@
 		55B99320160E376100D6548A /* CHCSVParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CHCSVParser.m; path = CHCSVParser/CHCSVParser.m; sourceTree = "<group>"; };
 		8DD76FA10486AA7600D96B5E /* CHCSVParser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CHCSVParser; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859EA3029092ED04C91782 /* CHCSVParser.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = CHCSVParser.1; sourceTree = "<group>"; };
+		D3BE26FF1886D5F500E9AFD2 /* Roster.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Roster.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				08FB7796FE84155DC02AAC07 /* main.m */,
 				5516BCBA12578DA90025F235 /* CHCSVParser */,
 				551981EE1203800300FBE033 /* Test.csv */,
+				D3BE26FF1886D5F500E9AFD2 /* Roster.csv */,
 				55A2E0FC16F01D5700885DD3 /* Test.scsv */,
 				5538B52C1344F0A1004930DD /* test.tsv */,
 				557FD05A1204A72B009FCDBA /* UnitTests.h */,
@@ -205,6 +208,7 @@
 			files = (
 				557FD05E1204A736009FCDBA /* Test.csv in Resources */,
 				5538B52D1344F0A1004930DD /* test.tsv in Resources */,
+				D3BE27001886D5F500E9AFD2 /* Roster.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +256,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -267,6 +273,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

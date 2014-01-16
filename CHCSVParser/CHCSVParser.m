@@ -131,14 +131,6 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 
 - (void)dealloc {
     [_stream close];
-#if !CHCSV_HAS_ARC
-    [_stream release];
-    [_stringBuffer release];
-    [_string release];
-    [_sanitizedField release];
-    [_validFieldCharacters release];
-    [super dealloc];
-#endif
 }
 
 #pragma mark -
@@ -683,7 +675,7 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 @interface _CHCSVAggregator : NSObject <CHCSVParserDelegate>
 
 @property (readonly) NSArray *lines;
-@property (readonly) NSError *error;
+@property (weak, readonly) NSError *error;
 
 @end
 
@@ -727,7 +719,99 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 
 @end
 
+@interface _CHCSVAggregatorDictionary : NSObject <CHCSVParserDelegate>
+
+@property (readonly) NSArray *lines;
+@property (weak, readonly) NSError *error;
+
+@end
+@implementation _CHCSVAggregatorDictionary {
+    NSMutableArray *_lines;
+    NSMutableArray *_header;
+    NSMutableDictionary *_currentLine;
+}
+
+#if !CHCSV_HAS_ARC
+- (void)dealloc {
+    [_currentLine release];
+    [_lines release];
+    [_error release];
+    [_header release];
+    [super dealloc];
+}
+#endif
+
+- (void)parserDidBeginDocument:(CHCSVParser *)parser {
+    _lines = [[NSMutableArray alloc] init];
+}
+
+- (void)parser:(CHCSVParser *)parser didBeginLine:(NSUInteger)recordNumber {
+    if (recordNumber == 1) {
+        _header = [[NSMutableArray alloc] init];
+    } else {
+        _currentLine = [[NSMutableDictionary alloc] init];
+    }
+}
+
+- (void)parser:(CHCSVParser *)parser didEndLine:(NSUInteger)recordNumber {
+    if (_currentLine) {
+        [_lines addObject:_currentLine];
+    }
+    CHCSV_RELEASE(_currentLine);
+    _currentLine = nil;
+}
+
+- (void)parser:(CHCSVParser *)parser didReadField:(NSString *)field atIndex:(NSInteger)fieldIndex {
+    if (_currentLine) {// second record
+        _currentLine[_header[fieldIndex]] = field;
+    }
+    else {
+        [_header addObject:field];
+    }
+}
+
+-(void)parserDidEndDocument:(CHCSVParser *)parser {
+    // get the last line
+    _currentLine = _lines.lastObject;
+    if (_currentLine.count == 1) {
+        [(NSString *)_currentLine[_header[0]] length] > 0 ? : [_lines removeLastObject];
+    }
+}
+
+- (void)parser:(CHCSVParser *)parser didFailWithError:(NSError *)error {
+    _error = CHCSV_RETAIN(error);
+    CHCSV_RELEASE(_lines);
+    _lines = nil;
+}
+
+@end
+
 @implementation NSArray (CHCSVAdditions)
+
++(instancetype)arrayWithContentsOfCSVFileMappedToTheHeader:(NSString *)csvFilePath {
+    return [self arrayWithContentsOfCSVFileMappedToTheHeader:csvFilePath options:0];
+}
+
++(instancetype)arrayWithContentsOfCSVFileMappedToTheHeader:(NSString *)csvFilePath options:(CHCSVParserOptions)options {
+    NSParameterAssert(csvFilePath);
+    _CHCSVAggregatorDictionary *aggregator = [[_CHCSVAggregatorDictionary alloc] init];
+    CHCSVParser *parser = [[CHCSVParser alloc] initWithContentsOfCSVFile:csvFilePath];
+    [parser setDelegate:aggregator];
+    
+    [parser setRecognizesBackslashesAsEscapes:!!(options & CHCSVParserOptionsRecognizesBackslashesAsEscapes)];
+    [parser setSanitizesFields:!!(options & CHCSVParserOptionsSanitizesFields)];
+    [parser setRecognizesComments:!!(options & CHCSVParserOptionsRecognizesComments)];
+    [parser setStripsLeadingAndTrailingWhitespace:!!(options & CHCSVParserOptionsStripsLeadingAndTrailingWhitespace)];
+    
+    [parser parse];
+    CHCSV_RELEASE(parser);
+    
+    NSArray *final = CHCSV_AUTORELEASE(CHCSV_RETAIN([aggregator lines]));
+    CHCSV_RELEASE(aggregator);
+    
+    return final;
+
+}
 
 + (instancetype)arrayWithContentsOfCSVFile:(NSString *)csvFilePath {
     return [self arrayWithContentsOfCSVFile:csvFilePath options:0];

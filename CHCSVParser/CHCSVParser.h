@@ -52,7 +52,7 @@ typedef NSInteger CHCSVErrorCode;
 
 @interface CHCSVParser : NSObject
 
-@property (assign) id<CHCSVParserDelegate> delegate;
+@property (unsafe_unretained) id<CHCSVParserDelegate> delegate;
 @property (assign) BOOL recognizesBackslashesAsEscapes; // default is NO
 @property (assign) BOOL sanitizesFields; // default is NO
 @property (assign) BOOL recognizesComments; // default is NO
@@ -98,6 +98,7 @@ typedef NS_OPTIONS(NSUInteger, CHCSVParserOptions) {
 
 @interface NSArray (CHCSVAdditions)
 
++ (instancetype)arrayWithContentsOfCSVFileMappedToTheHeader:(NSString *)csvFilePath;
 + (instancetype)arrayWithContentsOfCSVFile:(NSString *)csvFilePath;
 + (instancetype)arrayWithContentsOfCSVFile:(NSString *)csvFilePath options:(CHCSVParserOptions)options;
 - (NSString *)CSVString;
