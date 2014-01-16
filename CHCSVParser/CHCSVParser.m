@@ -131,6 +131,14 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 
 - (void)dealloc {
     [_stream close];
+#if !CHCSV_HAS_ARC
+    [_stream release];
+    [_stringBuffer release];
+    [_string release];
+    [_sanitizedField release];
+    [_validFieldCharacters release];
+    [super dealloc];
+#endif
 }
 
 #pragma mark -
@@ -675,7 +683,7 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 @interface _CHCSVAggregator : NSObject <CHCSVParserDelegate>
 
 @property (readonly) NSArray *lines;
-@property (weak, readonly) NSError *error;
+@property (readonly) NSError *error;
 
 @end
 
@@ -722,7 +730,7 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 @interface _CHCSVAggregatorDictionary : NSObject <CHCSVParserDelegate>
 
 @property (readonly) NSArray *lines;
-@property (weak, readonly) NSError *error;
+@property (readonly) NSError *error;
 
 @end
 @implementation _CHCSVAggregatorDictionary {
@@ -772,10 +780,12 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 
 -(void)parserDidEndDocument:(CHCSVParser *)parser {
     // get the last line
-    _currentLine = _lines.lastObject;
+    _currentLine = [_lines.lastObject copy];
     if (_currentLine.count == 1) {
         [(NSString *)_currentLine[_header[0]] length] > 0 ? : [_lines removeLastObject];
     }
+    CHCSV_RELEASE(_currentLine);
+    _currentLine = nil;
 }
 
 - (void)parser:(CHCSVParser *)parser didFailWithError:(NSError *)error {
