@@ -762,7 +762,10 @@ NSString *const CHCSVErrorDomain = @"com.davedelong.csv";
 }
 
 - (void)parser:(CHCSVParser *)parser didEndLine:(NSUInteger)recordNumber {
-    if (_currentLine) {
+    if (recordNumber == 1) {
+        [_lines addObject:_header];
+    }
+    else if (_currentLine) {
         [_lines addObject:_currentLine];
     }
     CHCSV_RELEASE(_currentLine);
